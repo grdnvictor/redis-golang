@@ -1,0 +1,52 @@
+# .dockerignore - Fichiers à exclure du build Docker
+
+# Binaires compilés
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Fichiers de test
+*.test
+
+# Output du profiler
+*.out
+*.prof
+
+# Fichiers de couverture de code
+*.cover
+
+# Dépendances
+vendor/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation et scripts de développement
+README.md
+Makefile
+docker-compose.yml
+.dockerignore
+
+# Logs locaux
+logs/
+*.log

@@ -1,0 +1,47 @@
+services:
+  redis-go:
+    build: .
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_HOST=0.0.0.0
+      - REDIS_PORT=6379
+      - REDIS_MAX_CONNECTIONS=1000
+      - REDIS_RDB_ENABLED=true
+      - REDIS_RDB_FILE=./data/dump.rdb
+      - REDIS_RDB_SAVE_INTERVAL=300  # 5 minutes
+      - REDIS_RDB_SAVE_ON_EXIT=true
+    networks:
+      - redis-network
+    restart: unless-stopped
+    volumes:
+      # Persister les données RDB
+      - redis-data:/app/data
+
+  redis-cli:
+    image: redis:7-alpine
+    stop_grace_period: 1s
+    depends_on:
+      - redis-go
+    networks:
+      - redis-network
+    stdin_open: true
+    tty: true
+    environment:
+      # Variables pour améliorer l'expérience + UTF-8
+      - TERM=xterm-256color
+      - LANG=C.UTF-8
+      - LC_ALL=C.UTF-8
+      - REDISCLI_HISTFILE=/tmp/.rediscli_history
+    volumes:
+      # Garde l'historique entre les sessions
+      - redis-cli-data:/tmp
+    command: redis-cli -h redis-go -p 6379 --no-auth-warning
+
+networks:
+  redis-network:
+    driver: bridge
+
+volumes:
+  redis-cli-data:
+  redis-data:  # Nouveau volume pour persister les données RDB
