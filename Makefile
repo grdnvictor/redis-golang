@@ -31,7 +31,16 @@ test:
 
 down:
 	@if $(COMPOSE_COMMAND) ps -q | grep -q .; then \
-		echo "🧹 Nettoyage des conteneurs..."; \
+		echo "🧹 Suppression des conteneurs..."; \
+		$(COMPOSE_COMMAND) down > /dev/null 2>&1; \
+		echo "✅ Nettoyage terminé"; \
+	else \
+		echo "ℹ️ Aucun conteneur à supprimer"; \
+	fi
+
+down-volume:
+	@if $(COMPOSE_COMMAND) ps -q | grep -q .; then \
+		echo "🧹 Suppression des conteneurs ET de leurs volumes..."; \
 		$(COMPOSE_COMMAND) down -v > /dev/null 2>&1; \
 		echo "✅ Nettoyage terminé"; \
 	else \
@@ -44,6 +53,15 @@ logs:
 
 # Session interactive redis-cli
 cli:
+	@echo "🔍 Vérification du statut de Redis-Go..."
+	@if ! $(COMPOSE_COMMAND) ps --services --filter "status=running" | grep -q "$(REDIS_SERVICE)"; then \
+		echo "⚠️  Redis-cli dépend de Redis-Go, démarrage en cours..."; \
+		$(COMPOSE_COMMAND) up -d $(REDIS_SERVICE) > /dev/null 2>&1; \
+		echo "✅ Redis-Go démarré !"; \
+		sleep 2; \
+	else \
+		echo "✅ Redis-Go est en cours d'exécution !"; \
+	fi
 	@echo "🐳 Préparation de redis-cli..."
 	@$(COMPOSE_COMMAND) up -d $(REDIS_CLI_SERVICE) > /dev/null 2>&1
 	@echo "✅ Container redis-cli prêt"

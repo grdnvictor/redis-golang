@@ -2,7 +2,6 @@ package commands
 
 import (
 	"strconv"
-	"strings"
 
 	"redis-go/internal/protocol"
 	"redis-go/internal/storage"
