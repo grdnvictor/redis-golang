@@ -114,6 +114,17 @@ func (commandRegistry *RedisCommandRegistry) registerAllCommands() {
 		"DBSIZE":   commandRegistry.handleDatabaseSizeCommand,
 		"FLUSHALL": commandRegistry.handleFlushAllCommand,
 		"ALAIDE":   commandRegistry.handleHelpCommand,
+
+		// Commandes Stream (Redis 5.0+)
+		"XADD":       commandRegistry.handleStreamAddCommand,        // Add message to stream
+		"XRANGE":     commandRegistry.handleStreamRangeCommand,      // Get range of messages
+		"XREAD":      commandRegistry.handleStreamReadCommand,       // Read messages from stream
+		"XLEN":       commandRegistry.handleStreamLengthCommand,     // Get stream length
+		"XDEL":       commandRegistry.handleStreamDeleteCommand,     // Delete messages from stream
+		"XGROUP":     commandRegistry.handleStreamGroupCommand,      // Consumer group management
+		"XREADGROUP": commandRegistry.handleStreamReadGroupCommand, // Read from consumer group
+		"XACK":       commandRegistry.handleStreamAckCommand,       // Acknowledge messages
+		"XPENDING":   commandRegistry.handleStreamPendingCommand,   // Get pending messages
 	}
 
 	for commandName, handler := range commands {

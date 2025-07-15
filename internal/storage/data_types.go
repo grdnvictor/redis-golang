@@ -11,6 +11,7 @@ const (
 	RedisSetType
 	RedisHashType
 	RedisZSetType
+	RedisStreamType
 )
 
 // RedisStorageValue représente une valeur stockée avec son type et TTL

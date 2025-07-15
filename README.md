@@ -18,6 +18,7 @@
 - **Lists** bidirectionnelles avec manipulation avancée (LSET, LREM, LINSERT, LTRIM)
 - **Sets** pour collections uniques avec opérations ensemblistes (SDIFF, SINTER, SUNION)
 - **Hashes** pour objets structurés avec incréments numériques
+- **Streams** pour messaging temps réel et event sourcing (XADD, XREAD, XGROUP) 🔥
 
 ### Protocole / Implémentation
 - **RESP complet** compatible Redis
@@ -54,7 +55,13 @@ redis-cli -p 6379  # Test
 SET welcome "Coucou Redis en GO !!" EX 3600
 GET welcome
 ALAIDE  # Voir toutes les commandes
+
+# 🌊 Tester Redis Streams (NOUVEAU!)
+XADD events * user "Alice" action "login"
+XRANGE events - +
 ```
+
+> 📖 **Guide complet Redis Streams**: Consultez `REDIS_STREAMS_README.md` pour une documentation complète avec exemples pratiques!
 
 ---
 
@@ -214,6 +221,19 @@ graph TB
 | `HINCRBY` | `HINCRBY key field increment` | Incrémente champ entier |
 | `HINCRBYFLOAT` | `HINCRBYFLOAT key field increment` | Incrémente champ float |
 
+### 🌊 Streams (Redis 5.0+) - NOUVELLE FONCTIONNALITÉ RÉVOLUTIONNAIRE
+| Commande | Syntaxe | Description |
+|----------|---------|-------------|
+| `XADD` | `XADD stream id field value [field value ...]` | Ajoute un message au stream |
+| `XRANGE` | `XRANGE stream start end [COUNT count]` | Récupère messages dans une plage |
+| `XREAD` | `XREAD [COUNT count] [BLOCK ms] STREAMS stream [stream ...] id [id ...]` | Lit messages depuis stream |
+| `XLEN` | `XLEN stream` | Nombre de messages |
+| `XDEL` | `XDEL stream id [id ...]` | Supprime des messages |
+| `XGROUP` | `XGROUP CREATE/DESTROY stream group id` | Gère consumer groups |
+| `XREADGROUP` | `XREADGROUP GROUP group consumer STREAMS stream [stream ...] >` | Lit via consumer group |
+| `XACK` | `XACK stream group id [id ...]` | Acquitte messages traités |
+| `XPENDING` | `XPENDING stream group [consumer]` | Messages en attente |
+
 ### Utilitaires & Persistence
 | Commande | Syntaxe | Description |
 |----------|---------|-------------|
@@ -304,6 +324,27 @@ HINCRBYFLOAT user:123 level 0.5  # level = 5.5
 HGETALL user:123
 ```
 
+### 🌊 Streams - Event Sourcing & Messaging
+```bash
+# Ajouter des événements
+XADD events * user "Alice" action "login" timestamp "2024-01-15T10:30:00Z"
+XADD events * user "Bob" action "purchase" item "laptop" price "1200"
+
+# Lire tous les événements
+XRANGE events - +
+
+# Créer un consumer group
+XGROUP CREATE events notification_service 0
+
+# Lire avec consumer group
+XREADGROUP GROUP notification_service worker1 COUNT 1 STREAMS events >
+# Traitement...
+XACK events notification_service 1703188800000-0
+
+# Lecture bloquante (attendre nouveaux messages)
+XREAD BLOCK 5000 STREAMS events $
+```
+
 ### Persistence et monitoring
 ```bash
 BGSAVE                # Sauvegarde en arrière-plan
@@ -317,11 +358,13 @@ DBSIZE               # Nombre de clés actives
 
 ### ✅ Fonctionnalités supportées
 - **Protocole RESP** - 100% compatible
-- **Types de base** - String, List, Set, Hash
+- **Types de base** - String, List, Set, Hash, Stream
 - **TTL & Expiration** - Support complet
 - **Pattern matching** - KEYS avec glob patterns
 - **Persistence RDB** - Sauvegarde/restauration
-- **Commandes avancées** - 60+ commandes implémentées
+- **Redis Streams** - Event sourcing & messaging temps réel
+- **Consumer Groups** - Distribution de charge et acquittement
+- **Commandes avancées** - 70+ commandes implémentées
 
 ### 🔄 En développement
 - **Sorted Sets** (ZADD, ZRANGE, ZRANK)
@@ -339,6 +382,7 @@ DBSIZE               # Nombre de clés actives
 ## Roadmap
 
 ### Prochaines versions
+- [x] **Redis Streams**: XADD/XREAD/XGROUP pour event sourcing - ✅ IMPLÉMENTÉ
 - [ ] **Sorted Sets**: ZADD/ZRANGE avec scores flottants
 - [ ] **Pub/Sub système**: PUBLISH/SUBSCRIBE temps réel
 - [ ] **Transactions**: MULTI/EXEC/WATCH pour atomicité

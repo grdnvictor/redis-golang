@@ -48,7 +48,7 @@ func (commandRegistry *RedisCommandRegistry) handleFlushAllCommand(commandArgume
 func (commandRegistry *RedisCommandRegistry) handleHelpCommand(commandArguments []string, redisStorage *storage.RedisInMemoryStorage, protocolEncoder *protocol.RedisSerializationProtocolEncoder) error {
 	if len(commandArguments) == 0 {
 		// Liste toutes les commandes séparées par des virgules
-		return protocolEncoder.WriteSimpleStringResponse("ALAIDE Redis-Go: SET, GET, DEL, EXISTS, TYPE, INCR, DECR, INCRBY, DECRBY, APPEND, STRLEN, GETRANGE, SETRANGE, MSET, MGET, GETSET, MSETNX, GETDEL, TTL, PTTL, EXPIRE, PEXPIRE, PERSIST, LPUSH, RPUSH, LPOP, RPOP, LLEN, LRANGE, LSET, LREM, LINSERT, LTRIM, SADD, SMEMBERS, SISMEMBER, SREM, SCARD, SDIFF, SINTER, SUNION, HSET, HGET, HGETALL, HEXISTS, HDEL, HLEN, HKEYS, HVALS, HINCRBY, HINCRBYFLOAT, SAVE, BGSAVE, LASTSAVE, INFO, PING, ECHO, KEYS, DBSIZE, FLUSHALL - Tapez ALAIDE <commande> pour details")
+		return protocolEncoder.WriteSimpleStringResponse("ALAIDE Redis-Go: SET, GET, DEL, EXISTS, TYPE, INCR, DECR, INCRBY, DECRBY, APPEND, STRLEN, GETRANGE, SETRANGE, MSET, MGET, GETSET, MSETNX, GETDEL, TTL, PTTL, EXPIRE, PEXPIRE, PERSIST, LPUSH, RPUSH, LPOP, RPOP, LLEN, LRANGE, LSET, LREM, LINSERT, LTRIM, SADD, SMEMBERS, SISMEMBER, SREM, SCARD, SDIFF, SINTER, SUNION, HSET, HGET, HGETALL, HEXISTS, HDEL, HLEN, HKEYS, HVALS, HINCRBY, HINCRBYFLOAT, XADD, XRANGE, XREAD, XLEN, XDEL, XGROUP, XREADGROUP, XACK, XPENDING, SAVE, BGSAVE, LASTSAVE, INFO, PING, ECHO, KEYS, DBSIZE, FLUSHALL - Tapez ALAIDE <commande> pour details")
 	}
 
 	// Aide détaillée pour une commande spécifique
@@ -179,6 +179,25 @@ func (commandRegistry *RedisCommandRegistry) handleHelpCommand(commandArguments 
 		return protocolEncoder.WriteSimpleStringResponse("DBSIZE - Retourne le nombre total de cles dans la base")
 	case "FLUSHALL":
 		return protocolEncoder.WriteSimpleStringResponse("FLUSHALL - Vide completement la base de donnees")
+	// Commandes Stream (Redis 5.0+)
+	case "XADD":
+		return protocolEncoder.WriteSimpleStringResponse("XADD stream id field value [field value ...] - Ajoute un message au stream (* = auto-generate ID)")
+	case "XRANGE":
+		return protocolEncoder.WriteSimpleStringResponse("XRANGE stream start end [COUNT count] - Recupere des messages dans une plage (- = debut, + = fin)")
+	case "XREAD":
+		return protocolEncoder.WriteSimpleStringResponse("XREAD [COUNT count] [BLOCK ms] STREAMS stream [stream ...] id [id ...] - Lit des messages ($ = latest)")
+	case "XLEN":
+		return protocolEncoder.WriteSimpleStringResponse("XLEN stream - Retourne le nombre de messages dans un stream")
+	case "XDEL":
+		return protocolEncoder.WriteSimpleStringResponse("XDEL stream id [id ...] - Supprime des messages d'un stream")
+	case "XGROUP":
+		return protocolEncoder.WriteSimpleStringResponse("XGROUP CREATE|DESTROY - Gere les consumer groups (ex: XGROUP CREATE mystream mygroup 0)")
+	case "XREADGROUP":
+		return protocolEncoder.WriteSimpleStringResponse("XREADGROUP GROUP group consumer [COUNT count] STREAMS stream [stream ...] > - Lit via consumer group")
+	case "XACK":
+		return protocolEncoder.WriteSimpleStringResponse("XACK stream group id [id ...] - Acquitte des messages traites par un consumer group")
+	case "XPENDING":
+		return protocolEncoder.WriteSimpleStringResponse("XPENDING stream group [consumer] - Affiche les messages en attente d'acquittement")
 	default:
 		return protocolEncoder.WriteSimpleStringResponse("Commande inconnue. Tapez ALAIDE pour voir toutes les commandes disponibles")
 	}
