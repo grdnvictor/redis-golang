@@ -10,6 +10,7 @@
 | **ALLARD Alexandre** | **`5IW2`** |
 |  **GRANDIN Victor**  | **`5IW2`** |
 |  **NKUMBA Estelle**  | **`5IW2`** |
+|  **SAIGH Bilel**     | **`5IW2`** |
 
 ## Fonctionnalités
 
